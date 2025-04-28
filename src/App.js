@@ -1,22 +1,32 @@
+// import React from 'react';
+// import './App.css';
+// import { ThemeProvider } from './ThemeContext';
+// import AppRouter from './AppRouter';
 
+// function App() {
+//   return (
+//     <ThemeProvider>
+//       <AppRouter />
+//     </ThemeProvider>
+//   );
+// }
+
+// export default App;
+
+
+import React from 'react';
 import './App.css';
-import ResumeUpload from './components/resumeUpload';
-import ResumeEditor from './components/resumeEditor';
-import { useState } from 'react';
+import { ThemeProvider } from './layouts/ThemeContext';
+import { AuthProvider } from './authentication/AuthContext';
+import AppRouter from './routes/AppRouter';
 
 function App() {
-  const [resumeId, setResumeId] = useState(null);
   return (
-     <div className="App">
-      <h1>Resume Editor & Career Predictor</h1>
-      <ResumeUpload onUploadSuccess={(id) => setResumeId(id)} />
-
-      {resumeId && (
-        <div style={{ marginTop: '40px' }}>
-          <ResumeEditor resumeId={resumeId} />
-        </div>
-      )}
-    </div>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
