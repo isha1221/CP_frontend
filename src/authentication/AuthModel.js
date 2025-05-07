@@ -25,12 +25,12 @@ const AuthModal = ({ isOpen, onClose, currentPath }) => {
             <X size={20} />
           </button>
         </div>
-        
+
         <div className="modal-content">
           <p>You need to be logged in to view this resume.</p>
           <p>Please log in to your account or create a new one to continue.</p>
         </div>
-        
+
         <div className="modal-footer">
           <button className="button primary" onClick={handleLogin}>
             <LogIn size={16} />

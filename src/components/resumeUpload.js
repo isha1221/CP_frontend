@@ -1,7 +1,13 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Upload, File, CheckCircle, AlertTriangle } from "lucide-react";
+import {
+  Upload,
+  File,
+  CheckCircle,
+  AlertTriangle,
+  CreditCard,
+} from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner";
 
 const ResumeUpload = ({ redirectToEdit = false }) => {
@@ -11,6 +17,7 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [limitReached, setLimitReached] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleUpload = async () => {
@@ -25,13 +32,17 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
     try {
       setUploading(true);
       setError(null);
-      
-      const res = await axios.post("http://localhost:3333/resume/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
+
+      const res = await axios.post(
+        "http://localhost:3333/resume/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       setUploadSuccess(true);
-      
+
       // If redirectToEdit flag is true, navigate to the edit page
       if (redirectToEdit && res.data?.id) {
         setTimeout(() => {
@@ -40,17 +51,33 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
       }
     } catch (err) {
       console.error("Upload failed:", err);
-      setError("Failed to upload resume. Please try again.");
+
+      // Check if the error is due to plan limit
+      if (
+        err.response?.status === 403 ||
+        err.response?.data?.message?.includes("limit") ||
+        err.message?.includes("limit")
+      ) {
+        setError("You have reached your plan's upload limit.");
+        setLimitReached(true);
+      } else {
+        setError("Failed to upload resume. Please try again later.");
+      }
+
       setUploadSuccess(false);
     } finally {
       setUploading(false);
     }
   };
 
+  const handleNavigateToPlans = () => {
+    navigate("/plans");
+  };
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
     } else if (e.type === "dragleave") {
@@ -62,11 +89,12 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files && files[0] && files[0].type === "application/pdf") {
       setFile(files[0]);
       setError(null);
+      setLimitReached(false);
     } else {
       setError("Please upload a PDF file");
     }
@@ -77,6 +105,7 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
       setError(null);
+      setLimitReached(false);
     } else if (selectedFile) {
       setError("Please upload a PDF file");
       e.target.value = null;
@@ -91,6 +120,7 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
     setFile(null);
     setUploadSuccess(false);
     setError(null);
+    setLimitReached(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -98,31 +128,33 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
 
   return (
     <div className="resume-upload">
-      <div 
-        className={`drop-area ${dragActive ? 'active' : ''} ${error ? 'error' : ''}`}
+      <div
+        className={`drop-area ${dragActive ? "active" : ""} ${
+          error ? "error" : ""
+        }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={openFileDialog}
       >
-        <input 
+        <input
           ref={fileInputRef}
-          type="file" 
-          accept="application/pdf" 
+          type="file"
+          accept="application/pdf"
           onChange={handleFileChange}
           className="file-input"
         />
-        
-        {!file && !uploading && !uploadSuccess && (
+
+        {!file && !uploading && !uploadSuccess && !limitReached && (
           <div className="upload-prompt">
             <Upload size={48} className="upload-icon" />
             <h3>Upload Your Resume</h3>
             <p>Drag & drop a PDF file here, or click to browse</p>
           </div>
         )}
-        
-        {file && !uploading && !uploadSuccess && (
+
+        {file && !uploading && !uploadSuccess && !limitReached && (
           <div className="file-selected">
             <File size={32} className="file-icon" />
             <div className="file-info">
@@ -131,7 +163,7 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
             </div>
           </div>
         )}
-        
+
         {uploading && (
           <div className="uploading-state">
             <LoadingSpinner size={48} />
@@ -139,25 +171,38 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
             <p>Please wait while we analyze your document...</p>
           </div>
         )}
-        
+
         {uploadSuccess && (
           <div className="success-state">
             <CheckCircle size={48} className="success-icon" />
             <h3>Upload Successful!</h3>
-            <p>{redirectToEdit ? "Redirecting to editor..." : "Your resume has been uploaded."}</p>
+            <p>
+              {redirectToEdit
+                ? "Redirecting to editor..."
+                : "Your resume has been uploaded."}
+            </p>
           </div>
         )}
-        
-        {error && (
+
+        {error && !limitReached && (
           <div className="error-state">
             <AlertTriangle size={32} className="error-icon" />
             <p>{error}</p>
           </div>
         )}
+
+        {limitReached && (
+          <div className="limit-reached-state">
+            <AlertTriangle size={32} className="error-icon" />
+            <h3>Upload Limit Reached</h3>
+            <p>You've reached the maximum uploads for your current plan.</p>
+            <p>Upgrade your plan to upload more resumes.</p>
+          </div>
+        )}
       </div>
-      
-      {file && !uploading && !uploadSuccess && (
-        <button 
+
+      {file && !uploading && !uploadSuccess && !limitReached && (
+        <button
           className="button primary upload-button"
           onClick={(e) => {
             e.stopPropagation();
@@ -178,22 +223,23 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
           )}
         </button>
       )}
-      
+
+      {limitReached && (
+        <button className="button primary" onClick={handleNavigateToPlans}>
+          <CreditCard size={16} />
+          <span>Continue to Plans</span>
+        </button>
+      )}
+
       {uploadSuccess && !redirectToEdit && (
-        <button 
-          className="button secondary"
-          onClick={resetUpload}
-        >
+        <button className="button secondary" onClick={resetUpload}>
           <Upload size={16} />
           <span>Upload Another</span>
         </button>
       )}
-      
-      {error && file && (
-        <button 
-          className="button secondary"
-          onClick={resetUpload}
-        >
+
+      {error && file && !limitReached && (
+        <button className="button secondary" onClick={resetUpload}>
           <AlertTriangle size={16} />
           <span>Try Again</span>
         </button>
@@ -203,5 +249,3 @@ const ResumeUpload = ({ redirectToEdit = false }) => {
 };
 
 export default ResumeUpload;
-
-

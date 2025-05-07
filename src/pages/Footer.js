@@ -1,5 +1,5 @@
-import React from 'react';
-import { Code, Coffee } from 'lucide-react';
+import React from "react";
+import { Code, Coffee } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -9,10 +9,6 @@ const Footer = () => {
           © {new Date().getFullYear()} ResumeAI - Career Analysis Tools
         </div>
         <div className="footer-links">
-          {/* <a href="#" className="footer-link">
-            <GitHub size={16} />
-            <span>GitHub</span>
-          </a> */}
           <a href="#" className="footer-link">
             <Code size={16} />
             <span>API</span>

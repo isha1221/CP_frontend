@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Upload, Award, BarChart2, FileSearch } from 'lucide-react';
-import ResumeUpload from '../components/resumeUpload';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Upload, Award, BarChart2, FileSearch } from "lucide-react";
+import ResumeUpload from "../components/resumeUpload";
 
 const HomePage = () => {
   return (
@@ -9,15 +9,18 @@ const HomePage = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Optimize Your Career Path with AI</h1>
-          <p>Upload your resume, discover potential career paths, and get personalized recommendations.</p>
-          <Link to="/resumes/${id}" className="cta-button">
+          <p>
+            Upload your resume, discover potential career paths, and get
+            personalized recommendations.
+          </p>
+          <Link to="/resumes" className="cta-button">
             <FileSearch size={20} />
             <span>View My Resumes</span>
           </Link>
         </div>
-        <div className="hero-image">
-          <img src="/api/placeholder/500/320" alt="Career analysis visualization" />
-        </div>
+        {/* <div className="hero-image">
+          <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Ffree-photos-vectors%2Fsea-green-gradient&psig=AOvVaw1QB06223Y3LZsmQOA6WcJ_&ust=1746268045315000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJjroMjJhI0DFQAAAAAdAAAAABAE" alt="Career analysis visualization" />
+        </div> */}
       </section>
 
       <section className="features">
@@ -34,7 +37,7 @@ const HomePage = () => {
             <div className="feature-icon">
               <FileSearch size={32} />
             </div>
-         
+
             <h3>AI-Powered Analysis</h3>
             <p>Our AI extracts key skills and experience from your resume.</p>
           </div>
@@ -43,7 +46,9 @@ const HomePage = () => {
               <BarChart2 size={32} />
             </div>
             <h3>Career Predictions</h3>
-            <p>Get data-driven career path suggestions based on your profile.</p>
+            <p>
+              Get data-driven career path suggestions based on your profile.
+            </p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
@@ -54,7 +59,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
 
       <section className="upload-section">
         <h2>Get Started Now</h2>
@@ -66,5 +70,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-

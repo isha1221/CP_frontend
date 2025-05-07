@@ -1,16 +1,22 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { UserPlus, User, Mail, Lock, AlertTriangle } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../authentication/AuthContext";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signup } = useAuth();
+
+  // Get the redirect path from location state or default to /plans
+  const from = location.state?.from || "/plans";
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,29 +48,19 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3333/auth/register", {
-        name: form.name,
-        email: form.email,
-        password: form.password
-      });
 
-      // Save token to localStorage if returned
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-      
-      // Save user info if returned
-      if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-      }
+      // Use the signup function from AuthContext
+      await signup(form.name, form.email, form.password);
 
-      // Redirect to dashboard after successful signup
-      navigate("/home");
+      // Add a small delay to ensure authentication state is updated
+      setTimeout(() => {
+        // Navigate to the plans page or the originally requested page
+        navigate(from, { replace: true });
+      }, 100);
     } catch (err) {
       if (err.response?.status === 409) {
         setError("Email already in use");
@@ -154,7 +150,11 @@ const Signup = () => {
           </div>
 
           <div className="form-footer">
-            <button type="submit" className="button primary full-width" disabled={loading}>
+            <button
+              type="submit"
+              className="button primary full-width"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <LoadingSpinner size={16} />

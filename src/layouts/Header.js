@@ -22,10 +22,12 @@ const Header = () => {
         </Link>
 
         <div className="header-actions">
-          <button 
-            className="icon-button" 
-            onClick={toggleTheme} 
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          <button
+            className="icon-button"
+            onClick={toggleTheme}
+            aria-label={
+              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            }
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
@@ -35,8 +37,12 @@ const Header = () => {
               <div className="user-info">
                 <span className="user-name">{currentUser.name}</span>
               </div>
-              
-              <button className="icon-button" onClick={handleLogout} aria-label="Log out">
+
+              <button
+                className="icon-button"
+                onClick={handleLogout}
+                aria-label="Log out"
+              >
                 <LogOut size={18} />
               </button>
             </div>

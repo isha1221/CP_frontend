@@ -12,23 +12,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem("token");
-      
+
       if (token) {
         try {
-          // Set default Authorization header for all requests
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          
-          // Fetch current user data
           const response = await axios.get("http://localhost:3333/auth/me");
           setCurrentUser(response.data);
         } catch (error) {
-          // Token might be expired or invalid
           console.error("Auth initialization error:", error);
           localStorage.removeItem("token");
           delete axios.defaults.headers.common["Authorization"];
         }
       }
-      
+
       setLoading(false);
     };
 
@@ -36,43 +32,54 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    
-    const response = await axios.post("http://localhost:3333/auth/login", 
-            new URLSearchParams({
-              username: email,
-              password: password
-            }), {
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-              }
-            }
-          )
-    
-    const { token, user } = response.data;
-    
-    localStorage.setItem("token", token);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    
-    setCurrentUser(user);
-    
-    return user;
+    try {
+      const response = await axios.post(
+        "http://localhost:3333/auth/login",
+        new URLSearchParams({
+          username: email,
+          password: password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      setCurrentUser(user);
+
+      return user;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const signup = async (name, email, password) => {
-    const response = await axios.post("http://localhost:3333/auth/register", {
-      name,
-      email,
-      password
-    });
-    
-    const { token, user } = response.data;
-    
-    localStorage.setItem("token", token);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    
-    setCurrentUser(user);
-    
-    return user;
+    try {
+      const response = await axios.post("http://localhost:3333/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      setCurrentUser(user);
+
+      return user;
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -87,8 +94,10 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    isAuthenticated: !!currentUser
+    isAuthenticated: !!currentUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthContext;

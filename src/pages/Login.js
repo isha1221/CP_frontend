@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+
 import { LogIn, Mail, Lock, AlertTriangle } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../authentication/AuthContext";
@@ -10,14 +10,14 @@ const Login = () => {
   const location = useLocation();
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { login } = useAuth();
-    
+
   // Get the redirect path from location state or default to dashboard
-  const from = location.state?.from || "/home";
+  const from = location.state?.from || "/plans";
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -27,7 +27,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!form.email || !form.password) {
       setError("Please enter both email and password");
       return;
@@ -35,30 +35,8 @@ const Login = () => {
 
     try {
       setLoading(true);
-    //   const response = await axios.post("http://localhost:3333/auth/login", {
-    //     email: form.email,
-    //     password: form.password
-    //   })
-      // const response = await axios.post("http://localhost:3333/auth/login", 
-      //   new URLSearchParams({
-      //     username: form.email,
-      //     password: form.password
-      //   }), {
-      //     headers: {
-      //       "Content-Type": "application/x-www-form-urlencoded"
-      //     }
-      //   }
-      // )
-      // console.log("✅ Login Success:", response.data);
-      // // Save token to localStorage
-      // localStorage.setItem("token", response.data.token);
-      // // Save user info if returned
-      // if (response.data.user) {
-      //   localStorage.setItem("user", JSON.stringify(response.data.user));
-      // }
 
       await login(form.email, form.password);
-
 
       // Redirect user to the page they tried to access
       navigate(from);
@@ -121,7 +99,11 @@ const Login = () => {
           </div>
 
           <div className="form-footer">
-            <button type="submit" className="button primary full-width" disabled={loading}>
+            <button
+              type="submit"
+              className="button primary full-width"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <LoadingSpinner size={16} />

@@ -1,49 +1,30 @@
-// import React from 'react';
-// import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-// import HomePage from './HomePage';
-// import ResumeEditPage from './ResumeEditPage';
-// import ResumeListPage from './ResumeListPage';
-// import NotFoundPage from './NotFoundPage';
-// import Layout from './Layout';
+import React from "react";
+import ProtectedRoute from "./ProtectRoute";
 
-// const AppRouter = () => {
-//   return (
-//     <BrowserRouter>
-//       <Routes>
-//         <Route path="/" element={<Layout />}>
-//           <Route index element={<HomePage />} />
-//           <Route path="resumes" element={<ResumeListPage />} />
-//           <Route path="resume/:id" element={<ResumeEditPage />} />
-//           <Route path="404" element={<NotFoundPage />} />
-//           <Route path="*" element={<Navigate to="/404" replace />} />
-//         </Route>
-//       </Routes>
-//     </BrowserRouter>
-//   );
-// };
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Login from "../pages/Login";
+import Signup from "../pages/SignUp";
+import HomePage from "../pages/HomePage";
+import ResumeEditor from "../components/resumeEditor";
+import ResumeUpload from "../components/resumeUpload";
+import ResumeListPage from "../pages/ResumeListPage";
+import Header from "../layouts/Header";
+import Footer from "../pages/Footer";
+import { useAuth } from "../authentication/AuthContext";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import AlertTriangle from "../components/AlertTriangle";
+import LoadingSpinner from "../components/LoadingSpinner";
+import axios from "axios";
+import PlansPage from "../pages/PlansPage";
 
-// export default AppRouter;
-
-import React from 'react';
-import ProtectedRoute from './ProtectRoute';
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from '../pages/Login';
-import Signup from '../pages/SignUp';
-import HomePage from '../pages/HomePage';
-import ResumeEditor from '../components/resumeEditor';
-import ResumeUpload from '../components/resumeUpload';
-// import ProtectedRoute from './ProtectRoute';
-import Header from '../layouts/Header';
-import Footer from '../pages/Footer';
-import { useAuth } from '../authentication/AuthContext';
-import { useEffect,useState } from 'react';
-import {useParams} from 'react-router-dom';
-import AlertTriangle from '../components/AlertTriangle';
-import LoadingSpinner from '../components/LoadingSpinner';
-import axios from 'axios';
-
-const AppRouter = () => {  const { isAuthenticated } = useAuth();
+const AppRouter = () => {
+  const { isAuthenticated } = useAuth();
 
   return (
     <Router>
@@ -53,30 +34,57 @@ const AppRouter = () => {  const { isAuthenticated } = useAuth();
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/login" element={
-              isAuthenticated ? <Navigate to="/home" /> : <Login />
-            } />
-            <Route path="/signup" element={
-              isAuthenticated ? <Navigate to="/home" /> : <Signup />
-            } />
-            
+            <Route
+              path="/login"
+              element={isAuthenticated ? <Navigate to="/home" /> : <Login />}
+            />
+            <Route
+              path="/signup"
+              element={isAuthenticated ? <Navigate to="/home" /> : <Signup />}
+            />
+
             {/* Protected routes */}
-            <Route path="/home" element={
-              <ProtectedRoute>
-                <HomePage/>
-               </ProtectedRoute>
-            } />
-            <Route path="/upload" element={
-              <ProtectedRoute>
-                <ResumeUpload redirectToEdit={true} />
-               </ProtectedRoute>
-            } />
-            <Route path="/resume/:id" element={
-               <ProtectedRoute>
-                <ResumeView />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <ResumeUpload redirectToEdit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resumes"
+              element={
+                <ProtectedRoute>
+                  <ResumeListPage redirectToEdit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/plans"
+              element={
+                <ProtectedRoute>
+                  <PlansPage redirectToEdit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resume/:id"
+              element={
+                <ProtectedRoute>
+                  <ResumeView />
+                </ProtectedRoute>
+              }
+            />
+
             {/* 404 route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
