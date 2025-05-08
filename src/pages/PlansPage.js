@@ -20,12 +20,6 @@ const PlansPage = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const navigate = useNavigate();
 
-  // Plan hierarchy for validation
-  // const planHierarchy = {
-  //   RP_BASIC: 1,
-  //   RP_MOD: 2,
-  //   RP_PRO: 3,
-  // };
 
   // Set initial selected plan based on localStorage
   useEffect(() => {
